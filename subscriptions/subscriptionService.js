@@ -1,6 +1,6 @@
 const subscriptionModel = require("./subscriptionModel")
 delete require.cache[require.resolve('../movies/movieService')];
-delete require.cache[require.resolve('../members/memberService')];
+//delete require.cache[require.resolve('../members/memberService')];
 const memberService = require("../members/memberService")
 const movieService = require("../movies/movieService");
 
