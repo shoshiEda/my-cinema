@@ -43,6 +43,8 @@ const getMovieById = async(id)=>{
     throw new Error("Service unavailable")
 }
 }
+
+
 const createMovie = async(newMovie)=>{
     try{
     const savedMovie = new movieModel(newMovie)

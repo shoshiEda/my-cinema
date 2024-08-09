@@ -1,6 +1,8 @@
 const memberModel = require("./memberModel")
 const memberRepository = require("./memberRepository")
+delete require.cache[require.resolve('../subscriptions/subscriptionService')];
 const subscriptionService = require("../subscriptions/subscriptionService")
+
 
 
 const getAllMembers = async()=>{

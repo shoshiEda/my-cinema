@@ -1,6 +1,10 @@
 const subscriptionModel = require("./subscriptionModel")
-const movieService = require("../movies/movieService")
+delete require.cache[require.resolve('../movies/movieService')];
+delete require.cache[require.resolve('../members/memberService')];
 const memberService = require("../members/memberService")
+const movieService = require("../movies/movieService");
+
+console.log(movieService,memberService)
 
 
 
@@ -40,7 +44,7 @@ const getMoviesByMember = async(memberId)=>{
             
             const fullMoviesData = await Promise.all(subscription.movies.map(async(movie) => 
                 {
-                    const fullMovieData = await movieService.getMovieById(movie.movieId)
+                    const {_doc:fullMovieData} = await movieService.getMovieById(movie.movieId)
                     return {...fullMovieData,dates:[...movie.date]}
                 } ))
             return fullMoviesData
@@ -53,6 +57,8 @@ const getMoviesByMember = async(memberId)=>{
 }
 
 getMoviesByMember('66b4dced7e07f527acc9debc')
+
+
 
 const findMembersByMovieId = async (movieId) => {
     try {
