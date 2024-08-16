@@ -5,7 +5,11 @@ const movieSchema = new mongoose.Schema({
     name: String,
     premiered: Date,
     genres:[String],
-    img:String
+    img:String,
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
 
 })
 

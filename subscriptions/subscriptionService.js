@@ -37,6 +37,7 @@ const addSubscription = async(memberId,movieId)=>{
 }
 }
 
+
 const getMoviesByMember = async(memberId)=>{
     try {
         const subscription = await subscriptionModel.findOne({ memberId })

@@ -4,7 +4,8 @@ const URL = 'https://api.tvmaze.com/shows';
 
 const getMovies = async() => {
     const {data : movies} = await axios.get(URL)
-    return movies.map(movie => ({name:movie.name,premiered:movie.premiered,genres:movie.genres,img:movie.url}))
+    const creationDate = Date.now()
+    return movies.map(movie => ({name:movie.name,premiered:movie.premiered,genres:movie.genres,img:movie.image.medium,createAt:creationDate}))
 }
 
 module.exports = {getMovies}
