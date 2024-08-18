@@ -5,7 +5,6 @@ const subscriptionService = require("../subscriptions/subscriptionService")
 
 const getAllMovies = async(search,pageIdx,limitPerPage,searchByGenre)=>{
     try{
-        console.log(searchByGenre)
     const countMovies = await movieModel.countDocuments({})
     let movies=[]
     if(!countMovies)
@@ -15,7 +14,7 @@ const getAllMovies = async(search,pageIdx,limitPerPage,searchByGenre)=>{
             const newMovie = new movieModel(movie)
             await newMovie.save()
         }
-        movies = await movieModel.find({}).limit(limitPerPage); 
+        movies = await movieModel.find({}).limit(limitPerPage)
         return {movies,isLastPage:false}
     }
     else{
@@ -34,7 +33,6 @@ const getAllMovies = async(search,pageIdx,limitPerPage,searchByGenre)=>{
         .limit(limitPerPage) 
         .lean() 
         
-        console.log(movies)
         fixedMovies = await Promise.all(movies.map(async (movie) => {
             const members = await subscriptionService.findMembersByMovieId(movie._id);
             return { ...movie, members }
@@ -43,6 +41,15 @@ const getAllMovies = async(search,pageIdx,limitPerPage,searchByGenre)=>{
         return {movies:fixedMovies,isLastPage}
     }
     
+} catch (error) {
+    console.error("Error in movie service:", error)
+    throw new Error("Service unavailable")
+}
+}
+
+const getAllMovieNames = ()=>{
+    try{
+    return movieModel.find({}, '_id name')
 } catch (error) {
     console.error("Error in movie service:", error)
     throw new Error("Service unavailable")
@@ -92,4 +99,4 @@ const deleteMovie = async(id)=>{
 }
 }
 
-module.exports = {getAllMovies,createMovie,updateMovie,deleteMovie,getMovieById}
+module.exports = {getAllMovies,getAllMovieNames,createMovie,updateMovie,deleteMovie,getMovieById}

@@ -16,6 +16,17 @@ router.get("/", async (req, res) => {
 }
 })
 
+router.get("/all", async (req, res) => {
+    try{
+    const movies = await movieService.getAllMovieNames()
+    return res.json(movies)
+} catch (error) {
+    console.error("Error fetching movies:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+}
+})
+
+
 
 router.get("/:id", async (req, res) => {
     try{

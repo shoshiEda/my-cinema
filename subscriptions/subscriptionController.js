@@ -6,8 +6,8 @@ const subscriptionService = require("./subscriptionService")
 
 router.post("/", async (req, res) => {
     try{
-        const { memberId , movieId } = req.body
-        const status = await subscriptionService.addSubscription(memberId , movieId)
+        const { memberId , movieId , movieDate } = req.body
+        const status = await subscriptionService.addSubscription(memberId , movieId , movieDate)
         return res.json({ status })
 } catch (error) {
     console.error("Error adding member:", error);

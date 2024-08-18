@@ -4,38 +4,32 @@ delete require.cache[require.resolve('../movies/movieService')];
 const memberService = require("../members/memberService")
 const movieService = require("../movies/movieService");
 
-console.log(movieService,memberService)
 
 
 
-const addSubscription = async(memberId,movieId)=>{
+const addSubscription = async (memberId, movieId, movieDate) => {
     try {
-        const subscription = await subscriptionModel.findOne({ memberId })
-        const currentDate = new Date()
-        if (subscription) {
-            const movieIndex = subscription.movies.findIndex(movie => movie.movieId === movieId)
-            if (movieIndex !== -1) {
-                subscription.movies[movieIndex].date.push(currentDate)
-            } else {
-                subscription.movies.push({ movieId, date: [currentDate] })
-            }
+        const subscription = await subscriptionModel.findOne({ memberId });
 
-            await subscription.save();
-            return "Subscription updated";
-        } else {
+        if (subscription) {
+            subscription.movies.push({ movieId, date: movieDate })
+            await subscription.save()
+            return "Subscription added";
+        }else {
             const newSubscription = new subscriptionModel({
                 memberId,
-                movies: [{ movieId, date: currentDate }]
-            });
-
-            await newSubscription.save();
-            return "New subscription created";
+                movies: [{ movieId, date: movieDate }]
+            })
+            await newSubscription.save()
+            return "Subscription added";
         }
-} catch (error) {
-    console.error("Error in subscription service:", error)
-    throw new Error("Service unavailable")
-}
-}
+    } catch (error) {
+        console.error("Error in subscription service:", error);
+        throw new Error("Service unavailable");
+    }
+};
+
+
 
 
 const getMoviesByMember = async(memberId)=>{
@@ -46,7 +40,7 @@ const getMoviesByMember = async(memberId)=>{
             const fullMoviesData = await Promise.all(subscription.movies.map(async(movie) => 
                 {
                     const {_doc:fullMovieData} = await movieService.getMovieById(movie.movieId)
-                    return {...fullMovieData,dates:[...movie.date]}
+                    return {...fullMovieData,date:movie.date}
                 } ))
             return fullMoviesData
         } else return []
@@ -57,7 +51,6 @@ const getMoviesByMember = async(memberId)=>{
 }
 }
 
-getMoviesByMember('66b4dced7e07f527acc9debc')
 
 
 
@@ -74,7 +67,7 @@ const findMembersByMovieId = async (movieId) => {
                 .filter(movie => movie.movieId.toString() === movieId.toString())
                 .map(movie => movie.date);
 
-            return { ...member.toObject(), dates }
+            return { ...member, dates }
         }))   
         return members
     } catch (error) {

@@ -5,24 +5,41 @@ const subscriptionService = require("../subscriptions/subscriptionService")
 
 
 
-const getAllMembers = async()=>{
+const getAllMembers = async(search,pageIdx,limitPerPage)=>{
     try{
-    let members = await memberModel.find({})
-    if(!members.length)
+        const countMembers = await memberModel.countDocuments({})
+        let members=[]
+   
+    if(!countMembers)
     {
         members = await memberRepository.getMembers()
         for (const member of members) {
             const newMember = new memberModel(member)
             await newMember.save()
         }
-        members = await memberModel.find({}); 
+        members = await memberModel.find({}).limit(limitPerPage)
+        return {members,isLastPage:false}
     }else{
+        const lastPage = countMembers%limitPerPage? Math.floor(countMembers/limitPerPage)+1 : Math.floor(countMembers/limitPerPage)
+        const isLastPage = lastPage===pageIdx+1? true : false
+        const skip = pageIdx * limitPerPage;
+        members = await memberModel.find({
+        $or: [
+            { name: { $regex: search, $options: "i" } }, 
+            { email: { $regex: search, $options: "i" } }
+        ]  
+    })         
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitPerPage) 
+        .lean() 
         members = await Promise.all(members.map(async (member) => {
             const movies = await subscriptionService.getMoviesByMember(member._id)
-            return { ...member.toObject(), movies }
+            return { ...member, movies }
         }))
+        return {members,isLastPage}
     }
-    return members
+    
 } catch (error) {
     console.error("Error in member service:", error)
     throw new Error("Service unavailable")
@@ -43,7 +60,7 @@ const createMember = async(newMember)=>{
     try{
     const savedMember = new memberModel(newMember)
     await savedMember.save()
-    return "saved"
+    return savedMember
 } catch (error) {
     console.error("Error in member service:", error)
     throw new Error("Service unavailable")
@@ -51,8 +68,8 @@ const createMember = async(newMember)=>{
 }
 const updateMember = async(id, newData)=>{
     try{
-    await memberModel.findByIdAndUpdate(id, newData)
-    return "Updated"
+    const updatedMember = await memberModel.findByIdAndUpdate(id, newData)
+    return updatedMember
 } catch (error) {
     console.error("Error in member service:", error)
     throw new Error("Service unavailable")
