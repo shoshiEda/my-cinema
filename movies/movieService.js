@@ -92,6 +92,7 @@ const updateMovie = async(id, newData)=>{
 const deleteMovie = async(id)=>{
     try{
     await movieModel.findByIdAndDelete(id)
+    await subscriptionService.deleteMovieFromSubscribtions(id)
     return "Deleted"
 } catch (error) {
     console.error("Error in movie service:", error)

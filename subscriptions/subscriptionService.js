@@ -74,7 +74,21 @@ const findMembersByMovieId = async (movieId) => {
         console.error("Error in subscription service:", error)
         throw new Error("Service unavailable")
     }
-};
+}
+
+const deleteSubscribtion = async(memberId)=>{
+    await subscriptionModel.findOneAndDelete({memberId})
+}
+
+const deleteMovieFromSubscribtions = async(movieId)=>{
+    const subscriptions = await subscriptionModel.find({ "movies.movieId": movieId });
+
+    for (const subscription of subscriptions) {
+        subscription.movies = subscription.movies.filter(movie => movie.movieId !== movieId);
+        await subscription.save();
+    }
+    return subscriptions;
+}
 
 
-module.exports = {addSubscription,getMoviesByMember,findMembersByMovieId}
+module.exports = {addSubscription,getMoviesByMember,findMembersByMovieId,deleteSubscribtion,deleteMovieFromSubscribtions}

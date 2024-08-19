@@ -78,6 +78,7 @@ const updateMember = async(id, newData)=>{
 const deleteMember = async(id)=>{
     try{
     await memberModel.findByIdAndDelete(id)
+    await subscriptionService.deleteSubscribtion(id)
     return "Deleted"
 } catch (error) {
     console.error("Error in member service:", error)
